@@ -1,26 +1,150 @@
 @import "tailwindcss";
+/* Layered so Tailwind utilities can override library styles. */
+@import "lenis/dist/lenis.css" layer(components);
+@import "swiper/css" layer(components);
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* Phones keep the bottom-anchored layout; tall desktop windows don't. */
+@custom-variant desktop (@media (min-width: 768px) and (min-height: 800px));
+
+/*
+ * Design tokens — values taken from the Figma variables of the
+ * "Test Design" file. Names mirror the Figma variable collections
+ * (background/*, type/*, brand-colours/*, line/*, text-size/*, spacing/*).
+ * Each one becomes a Tailwind utility, e.g. --color-brand-primary →
+ * bg-brand-primary, --spacing-module-x → px-module-x.
+ */
+@theme {
+  /* ── Colour: background ───────────────────────────── */
+  --color-bg-dark: #0c0d10;
+  --color-bg-glow-1: #222737; /* radial gradient centre */
+  --color-bg-glow-2: #171a24; /* radial gradient mid */
+  --color-bg-surface: rgba(255, 255, 255, 0.05); /* icon buttons */
+  --color-bg-button-ring: rgba(255, 255, 255, 0.1);
+  --color-bg-medium: rgba(255, 255, 255, 0.6); /* send icon */
+
+  /* ── Colour: type ─────────────────────────────────── */
+  --color-text-light: #fafafa;
+  --color-text-dark: #0c0d10;
+  --color-text-caption: rgba(255, 255, 255, 0.6);
+  --color-text-error: #ffb4c0;
+
+  /* ── Colour: brand ────────────────────────────────── */
+  --color-brand-primary: #cdaaff; /* primary-colours-light */
+  --color-brand-action: #fafafa; /* action-colours */
+  --color-brand-accent: #b488f2; /* active dot, Lottie hexagon */
+  --color-caret: #65d5eb;
+  --color-dot: rgba(255, 255, 255, 0.25);
+
+  /* ── Colour: lines ────────────────────────────────── */
+  --color-line-medium: rgba(255, 255, 255, 0.6);
+  --color-focus-ring: #cdaaff;
+
+  /* ── Typography (size + line height + tracking) ───── */
+  --text-caption: 12px;
+  --text-caption--line-height: 1.35;
+  --text-caption--letter-spacing: 0.02em; /* Figma: 2% */
+  --text-body: 16px;
+  --text-body--line-height: 1.35;
+  --text-body--letter-spacing: 0.02em;
+  --text-xsmall: 19px; /* chat prompts */
+  --text-xsmall--line-height: 1.2;
+  --text-xsmall--letter-spacing: 0.01em; /* Figma: 1% */
+  --text-h4: 22px; /* walkthrough copy */
+  --text-h4--line-height: 1.25;
+  --text-h4--letter-spacing: 0.01em;
+  --text-h2: 28px; /* homepage headline */
+  --text-h2--line-height: 1.2;
+  --text-h2--letter-spacing: 0.01em;
+
+  /* ── Spacing ──────────────────────────────────────── */
+  --spacing-3xs: 8px;
+  --spacing-2xs: 12px;
+  --spacing-md: 24px;
+  --spacing-lg: 32px;
+  --spacing-2xl: 48px;
+
+  --spacing-module-x: 20px; /* module_left_right */
+  --spacing-module-y-sm: 24px; /* sml_module_top_btm */
+  --spacing-module-y: 48px; /* module_top_btm */
+
+  /* ── Sizing ───────────────────────────────────────── */
+  --container-page: 390px;
+  --spacing-header: 86px;
+  --spacing-control: 60px;
+  --spacing-icon-button: 46px;
+  --spacing-icon: 20px;
+
+  /* ── Radius ───────────────────────────────────────── */
+  --radius-button: 19px;
+  --radius-input: 18px;
+  --radius-pill: 200px;
+
+  /* ── Effects ──────────────────────────────────────── */
+  --shadow-icon-button: 0 4px 20px rgba(0, 0, 0, 0.05);
+  --shadow-ring-light: 0 0 0 8px rgba(255, 255, 255, 0.1);
+  --shadow-ring-light-hover: 0 0 0 8px rgba(255, 255, 255, 0.16);
+  --blur-icon-button: 60px;
+
+  /* ── Motion ───────────────────────────────────────── */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+/* next/font sets --font-bagoss / --font-sohne on <html>. */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-bagoss), "Helvetica Neue", Arial, sans-serif;
+  --font-body: var(--font-sohne), "Helvetica Neue", Arial, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  html {
+    color-scheme: dark;
   }
-}
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  body {
+    min-height: 100dvh;
+    background-color: var(--color-bg-dark);
+    background-image: radial-gradient(
+      369px 498px at 50% 29px,
+      var(--color-bg-glow-1) 0%,
+      var(--color-bg-glow-2) 50%,
+      var(--color-bg-dark) 100%
+    );
+    background-repeat: no-repeat;
+    color: var(--color-text-light);
+    font-family: var(--font-body);
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+    letter-spacing: var(--text-body--letter-spacing);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Preflight resets buttons to the default cursor. */
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 3px;
+  }
+
+  /* Revealed by GSAP entrance timelines. Hidden from first paint (no flash)
+     only when scripting is on and the user hasn't asked for reduced motion,
+     so content is never lost. */
+  @media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+    [data-animate] {
+      visibility: hidden;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
 }
